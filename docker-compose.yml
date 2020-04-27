@@ -1,0 +1,37 @@
+version: '3'
+services:
+  app:
+    container_name: geek_go
+    build: .
+    ports:
+      - 8899:8899
+    restart: on-failure
+    depends_on:
+      - postgres
+    networks:
+      - fullstack
+    env_file:
+      - .env
+    environment:
+      - DB_HOST=postgres
+
+  postgres:
+    image: postgres:latest
+    container_name: full_db_postgres
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=1234
+      - POSTGRES_DB=postgres
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    ports:
+      - 5432:5432
+    volumes:
+      - ./migrations/postgres:/docker-entrypoint-initdb.d/
+      - ./postgresVolume:/var/lib/postgresql
+    networks:
+      - fullstack
+
+# Networks to be created to facilitate communication between containers
+networks:
+  fullstack:
+    driver: bridge
